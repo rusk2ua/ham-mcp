@@ -104,6 +104,23 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 }
 ```
 
+### Cline (VS Code extension)
+
+Open the Cline extension settings in VS Code, navigate to **MCP Servers**, and add:
+
+```json
+{
+  "ham-radio": {
+    "command": "python",
+    "args": ["/path/to/ham-mcp/server.py"],
+    "disabled": false,
+    "autoApprove": []
+  }
+}
+```
+
+Alternatively, edit `~/.vscode/cline_mcp_settings.json` directly with the same block.
+
 ---
 
 ## AWS Serverless Deployment
