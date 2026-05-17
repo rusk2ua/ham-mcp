@@ -29,7 +29,7 @@ Point your AI at an S3 bucket or Google Drive folder full of ADIF logs, Cabrillo
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-org/ham-mcp.git
+git clone https://github.com/rusk2ua/ham-mcp.git
 cd ham-mcp
 pip install -r requirements.txt
 cp .env.example .env
