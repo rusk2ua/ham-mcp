@@ -1,0 +1,22 @@
+# Environment / secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# AWS SAM build artifacts
+.aws-sam/
+samconfig.toml
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
