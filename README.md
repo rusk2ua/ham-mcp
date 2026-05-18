@@ -8,13 +8,42 @@ Point your AI at an S3 bucket or Google Drive folder full of ADIF logs, Cabrillo
 
 ## What It Does
 
+### Log & document access
+
 | Capability | Example prompt |
 |------------|---------------|
 | List log files | *"List all the log files in the data lake."* |
-| Search by callsign | *"Find all QSOs with W1AW in the ARRL-DX-2024 log."* |
-| Parse contest logs | *"How many QSOs were on 40m in the Cabrillo log?"* |
-| Summarize PDFs | *"Summarize the Field Day results document."* |
+| Search by callsign | *"Find all QSOs with W1AW across every ARRL DX log."* |
+| Parse contest logs | *"How many QSOs were on 40m in the 2024 CQ WW Cabrillo log?"* |
+| Summarize PDFs | *"Summarize the Field Day 2023 results document."* |
 | List documents | *"What PDFs are in the data lake?"* |
+
+### Multi-year trend analysis
+
+| Capability | Example prompt |
+|------------|---------------|
+| Year-over-year QSO count | *"Compare total QSO counts for ARRL DX from 2020 through 2024. Show a year-by-year table."* |
+| Band trend | *"How has our 10m QSO count changed each year in CQ WW? Is there a solar cycle pattern?"* |
+| Score progression | *"Pull the claimed scores from each Field Day results PDF and chart the trend."* |
+| Mode breakdown | *"What percentage of our QSOs were CW vs SSB vs digital in each contest year?"* |
+| Multiplier trend | *"How have our DXCC multipliers changed year over year in ARRL DX?"* |
+| Best vs worst year | *"Which year was our strongest ARRL DX performance and what made it different?"* |
+
+### Cross-contest comparisons
+
+| Capability | Example prompt |
+|------------|---------------|
+| Contest comparison | *"Compare our QSO rates in ARRL DX vs CQ WW over the last three years."* |
+| Operator activity | *"Which operators appear most frequently across all contest logs?"* |
+| Band-by-band breakdown | *"Across all contests in 2024, which band produced the most QSOs?"* |
+
+### Callsign & contact research
+
+| Capability | Example prompt |
+|------------|---------------|
+| Contact history | *"How many times have we worked W1AW total, and in which contests?"* |
+| New entities | *"List any DXCC entities we only worked once across all logs."* |
+| Dupe analysis | *"Find callsigns that appear in both the 2023 and 2024 ARRL DX logs."* |
 
 ---
 
