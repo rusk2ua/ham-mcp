@@ -34,8 +34,8 @@ Resources:
 
 Outputs:
   McpEndpoint:
-    Description: MCP server URL — use this in your client config with transport sse
-    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+    Description: MCP server URL — use this in your client config with transport streamable-http
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com/mcp"
   S3BucketName:
     Description: S3 bucket configured for this deployment
     Value: !Ref S3BucketName

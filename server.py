@@ -105,8 +105,8 @@ def parse_log(year: str, log_key: str) -> list[dict]:
 # ── Lambda entry point (for AWS deployment) ───────────────────────────────────
 
 try:
-    from mcp.server.lambda_handler import create_handler
-    handler = create_handler(mcp)
+    from mangum import Mangum
+    handler = Mangum(mcp.streamable_http_app(), lifespan="off")
 except ImportError:
     pass  # Not running on Lambda
 
