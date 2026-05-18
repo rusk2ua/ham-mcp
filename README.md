@@ -45,6 +45,8 @@ Point your AI at an S3 bucket or Google Drive folder full of ADIF logs, Cabrillo
 | New entities | *"List any DXCC entities we only worked once across all logs."* |
 | Dupe analysis | *"Find callsigns that appear in both the 2023 and 2024 ARRL DX logs."* |
 
+> **Note on visualization:** The AI can reason over this data and produce narrative summaries or tables, but actual chart rendering (line graphs, bar charts) would require either a code interpreter environment (like Claude's analysis tool) or a separate visualization step. The prompts above are worded to ask for tables and comparisons, which any MCP-connected AI can handle directly.
+
 ---
 
 ## Requirements
