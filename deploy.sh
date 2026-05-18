@@ -11,14 +11,16 @@ set -euo pipefail
 REGION="us-east-1"
 STACK="ham-mcp"
 GDRIVE_FOLDER_ID=""
+CERTIFICATE_ARN=""
 
 # ── Args ──────────────────────────────────────────────────────────────────────
 while [[ $# -gt 0 ]]; do
   case $1 in
-    --bucket)  S3_BUCKET="$2";       shift 2 ;;
-    --region)  REGION="$2";          shift 2 ;;
-    --stack)   STACK="$2";           shift 2 ;;
+    --bucket)  S3_BUCKET="$2";        shift 2 ;;
+    --region)  REGION="$2";           shift 2 ;;
+    --stack)   STACK="$2";            shift 2 ;;
     --gdrive)  GDRIVE_FOLDER_ID="$2"; shift 2 ;;
+    --cert)    CERTIFICATE_ARN="$2";  shift 2 ;;
     *) echo "Unknown arg: $1"; exit 1 ;;
   esac
 done
@@ -63,7 +65,8 @@ aws cloudformation deploy \
       ImageUri="$IMAGE_URI" \
       VpcId="$VPC_ID" \
       SubnetIds="$SUBNET_IDS" \
-      GdriveFolderId="$GDRIVE_FOLDER_ID"
+      GdriveFolderId="$GDRIVE_FOLDER_ID" \
+      CertificateArn="$CERTIFICATE_ARN"
 
 # ── Print endpoint ─────────────────────────────────────────────────────────────
 echo ""

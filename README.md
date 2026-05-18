@@ -175,6 +175,7 @@ Optional flags:
 --region   AWS region (default: us-east-1)
 --stack    CloudFormation stack name (default: ham-mcp)
 --gdrive   Google Drive folder ID (optional)
+--cert     ACM certificate ARN for HTTPS (optional)
 ```
 
 The script prints the MCP endpoint URL when complete. Use it in your client config:

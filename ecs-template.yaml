@@ -18,6 +18,13 @@ Parameters:
     Type: String
     Default: ""
     Description: Google Drive folder ID (optional)
+  CertificateArn:
+    Type: String
+    Default: ""
+    Description: ACM certificate ARN for HTTPS (optional — leave blank for HTTP only)
+
+Conditions:
+  HasCertificate: !Not [!Equals [!Ref CertificateArn, ""]]
 
 Resources:
 
@@ -95,6 +102,19 @@ Resources:
       LoadBalancerArn: !Ref Nlb
       Protocol: TCP
       Port: 80
+      DefaultActions:
+        - Type: forward
+          TargetGroupArn: !Ref TargetGroup
+
+  ListenerTLS:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Condition: HasCertificate
+    Properties:
+      LoadBalancerArn: !Ref Nlb
+      Protocol: TLS
+      Port: 443
+      Certificates:
+        - CertificateArn: !Ref CertificateArn
       DefaultActions:
         - Type: forward
           TargetGroupArn: !Ref TargetGroup
