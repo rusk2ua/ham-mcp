@@ -15,7 +15,6 @@ Globals:
     Environment:
       Variables:
         S3_BUCKET: !Ref S3BucketName
-        AWS_REGION: !Ref AWS::Region
 
 Resources:
   HamMcpFunction:

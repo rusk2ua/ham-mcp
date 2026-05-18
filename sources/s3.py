@@ -4,7 +4,9 @@ import boto3
 
 
 def _client():
-    return boto3.client("s3", region_name=os.getenv("AWS_REGION", "us-east-1"))
+    # On Lambda, boto3 picks up the region automatically from the execution environment.
+    # Locally, set AWS_REGION or AWS_DEFAULT_REGION in your .env file.
+    return boto3.client("s3", region_name=os.getenv("AWS_REGION") or os.getenv("AWS_DEFAULT_REGION"))
 
 
 def list_files(prefix: str) -> list[dict]:
