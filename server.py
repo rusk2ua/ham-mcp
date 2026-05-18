@@ -9,7 +9,7 @@ from parsers import adif, cabrillo
 from sources import gdrive, s3
 
 load_dotenv()
-mcp = FastMCP("ham-radio", stateless_http=True)
+mcp = FastMCP("ham-radio", stateless_http=True, json_response=True)
 
 # Valid sub-folders under each year prefix
 YEAR_SUBFOLDERS = {"logs", "results", "articles", "rpt", "rules"}
@@ -122,7 +122,7 @@ def handler(event, context):
     async def run():
         transport = StreamableHTTPServerTransport(
             mcp_session_id=None,
-            is_json_response_enabled=False,
+            is_json_response_enabled=True,
             event_store=None,
         )
 
