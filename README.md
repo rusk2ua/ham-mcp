@@ -74,11 +74,16 @@ Then add the server to your AI client (see [Client Configuration](#client-config
 
 ## S3 Bucket Layout
 
+Files are organized by year, then by folder. Log format is detected automatically from the file extension.
+
 ```
 s3://your-bucket/
-├── logs/adif/          # *.adi, *.adif files
-├── logs/cabrillo/      # *.cbr, *.log files
-└── documents/          # *.pdf contest results, band plans, etc.
+└── 2025/
+    ├── logs/       # *.adi = ADIF,  *.cbr / *.log = Cabrillo
+    ├── results/    # contest result files
+    ├── articles/   # *.pdf articles and references
+    ├── rpt/        # reports
+    └── rules/      # contest rules documents
 ```
 
 ---
@@ -170,12 +175,14 @@ After deployment, use the `McpEndpoint` URL from the CloudFormation outputs in y
 {
   "mcpServers": {
     "ham-radio": {
-      "url": "https://<api-id>.execute-api.us-east-1.amazonaws.com",
-      "transport": "sse"
+      "url": "https://<api-id>.execute-api.us-east-1.amazonaws.com/mcp",
+      "transport": "streamable-http"
     }
   }
 }
 ```
+
+The base URL stays the same across redeployments. Only the `/mcp` path suffix and `streamable-http` transport are required.
 
 ---
 
@@ -189,7 +196,7 @@ https://drive.google.com/drive/folders/1AbCdEfGhIjKlMnOpQrStUvWxYz
                                         this is your GDRIVE_FOLDER_ID
 ```
 
-Pass `source="gdrive"` to the `list_logs` or `list_documents` tools.
+Pass `source="gdrive"` to the `list_files` tool.
 
 ---
 
@@ -208,6 +215,7 @@ Cabrillo QSO field positions vary by contest (ARRL DX, CQ WW, Field Day, etc.). 
 | PDF text is empty | PDF is image-only — run OCR before uploading |
 | MCP client can't connect | Use the absolute path to `server.py` in client config |
 | Lambda timeout | Increase `Timeout` in `template.yaml` (max 29s for API GW) |
+| "no authorization support detected" | Ensure you're using `transport: "streamable-http"` and the `/mcp` path suffix |
 
 ---
 
