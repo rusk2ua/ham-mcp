@@ -67,7 +67,7 @@ Resources:
   TaskSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: ECS task — allow HTTP from anywhere
+      GroupDescription: ECS task - allow HTTP from anywhere
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
