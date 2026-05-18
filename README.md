@@ -99,10 +99,11 @@ ham-mcp/
 ├── parsers/
 │   ├── adif.py          # ADIF log parser
 │   └── cabrillo.py      # Cabrillo log parser
+├── Dockerfile           # Container image for ECS
+├── ecs-template.yaml    # CloudFormation: ECS Fargate + NLB
+├── deploy.sh            # One-command AWS deploy
 ├── requirements.txt
 ├── run_local.sh         # Run server locally
-├── run_aws.sh           # Deploy to AWS Lambda
-├── template.yaml        # AWS SAM template
 └── .env.example
 ```
 
@@ -159,9 +160,9 @@ Alternatively, edit `~/.vscode/cline_mcp_settings.json` directly with the same b
 
 ---
 
-## AWS Serverless Deployment
+## AWS Deployment (ECS Fargate + NLB)
 
-For shared access without everyone running a local server, deploy to ECS Fargate + ALB. A single script handles everything: ECR repo creation, Docker build/push, and CloudFormation deploy.
+For shared access without everyone running a local server, deploy to ECS Fargate behind a Network Load Balancer. A single script handles everything: ECR repo creation, Docker build/push, and CloudFormation deploy.
 
 **Requirements:** AWS CLI, Docker, credentials with ECS/ECR/CloudFormation/IAM permissions.
 
@@ -182,16 +183,16 @@ The script prints the MCP endpoint URL when complete. Use it in your client conf
 {
   "mcpServers": {
     "ham-radio": {
-      "url": "http://<alb-dns-name>/sse",
+      "url": "http://<nlb-dns-name>/sse",
       "transport": "sse"
     }
   }
 }
 ```
 
-The base URL stays the same across redeployments as long as you use the same stack name. To update after code changes, just re-run `./deploy.sh` with the same arguments.
+The URL stays the same across redeployments as long as you use the same stack name. To update after code changes, just re-run `./deploy.sh` with the same arguments.
 
-**Cost:** ~$9/month for 1 Fargate task (0.25 vCPU / 0.5 GB). The ALB adds ~$16/month. Total ~$25/month for a always-on shared server.
+**Cost:** ~$9/month for 1 Fargate task (0.25 vCPU / 0.5 GB) + ~$2/month for the NLB. Total ~$11/month.
 
 ---
 
@@ -222,8 +223,8 @@ Cabrillo QSO field positions vary by contest (ARRL DX, CQ WW, Field Day, etc.). 
 | `NoCredentialsError` | Run `aws configure` or set `AWS_PROFILE` in `.env` |
 | Google Drive returns empty list | Confirm folder is shared as "Anyone with the link" |
 | PDF text is empty | PDF is image-only — run OCR before uploading |
-| MCP client can't connect | Use the absolute path to `server.py` in client config |
-| Lambda timeout | Increase `Timeout` in `template.yaml` (max 29s for API GW) |
+| MCP client can't connect locally | Use the absolute path to `server.py` in client config |
+| ECS task not healthy | Check `/ecs/ham-mcp` CloudWatch log group for errors |
 | "no authorization support detected" | Ensure you're using `transport: "sse"` and the `/sse` path suffix |
 
 ---
