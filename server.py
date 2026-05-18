@@ -104,11 +104,65 @@ def parse_log(year: str, log_key: str) -> list[dict]:
 
 # ── Lambda entry point (for AWS deployment) ───────────────────────────────────
 
-try:
-    from mangum import Mangum
-    handler = Mangum(mcp.streamable_http_app(), lifespan="off")
-except ImportError:
-    pass  # Not running on Lambda
+def handler(event, context):
+    """AWS Lambda handler — runs one stateless MCP request per invocation."""
+    import base64
+    import anyio
+    from mcp.server.streamable_http import StreamableHTTPServerTransport
+
+    body = event.get("body") or b""
+    if event.get("isBase64Encoded"):
+        body = base64.b64decode(body)
+    elif isinstance(body, str):
+        body = body.encode()
+
+    req_headers = {k.lower(): v for k, v in (event.get("headers") or {}).items()}
+    response: dict = {}
+
+    async def run():
+        transport = StreamableHTTPServerTransport(
+            mcp_session_id=None,
+            is_json_response_enabled=False,
+            event_store=None,
+        )
+
+        scope = {
+            "type": "http",
+            "asgi": {"version": "3.0"},
+            "http_version": "1.1",
+            "method": event.get("requestContext", {}).get("http", {}).get("method", "POST"),
+            "headers": [(k.encode(), v.encode()) for k, v in req_headers.items()],
+            "path": event.get("rawPath", "/mcp"),
+            "query_string": (event.get("rawQueryString") or "").encode(),
+            "root_path": "",
+            "server": ("localhost", 443),
+        }
+
+        async def receive():
+            return {"type": "http.request", "body": body, "more_body": False}
+
+        async def send(message):
+            if message["type"] == "http.response.start":
+                response["statusCode"] = message["status"]
+                response["headers"] = {
+                    k.decode(): v.decode() for k, v in message.get("headers", [])
+                }
+            elif message["type"] == "http.response.body":
+                response["body"] = message.get("body", b"").decode(errors="replace")
+
+        async with transport.connect() as (read_stream, write_stream):
+            async with anyio.create_task_group() as tg:
+                tg.start_soon(
+                    mcp._mcp_server.run,
+                    read_stream,
+                    write_stream,
+                    mcp._mcp_server.create_initialization_options(),
+                )
+                await transport.handle_request(scope, receive, send)
+                tg.cancel_scope.cancel()
+
+    anyio.run(run)
+    return response
 
 if __name__ == "__main__":
     mcp.run()
