@@ -57,45 +57,34 @@ Resources:
 
   # ── Networking ─────────────────────────────────────────────────────────────
 
-  AlbSg:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: ALB — allow HTTP from anywhere
-      VpcId: !Ref VpcId
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-
   TaskSg:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: ECS task — allow traffic from ALB only
+      GroupDescription: ECS task — allow HTTP from anywhere
       VpcId: !Ref VpcId
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 8080
           ToPort: 8080
-          SourceSecurityGroupId: !Ref AlbSg
+          CidrIp: 0.0.0.0/0
 
   # ── Load Balancer ──────────────────────────────────────────────────────────
 
-  Alb:
+  Nlb:
     Type: AWS::ElasticLoadBalancingV2::LoadBalancer
     Properties:
+      Type: network
       Scheme: internet-facing
       Subnets: !Ref SubnetIds
-      SecurityGroups: [!Ref AlbSg]
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       VpcId: !Ref VpcId
-      Protocol: HTTP
+      Protocol: TCP
       Port: 8080
       TargetType: ip
-      HealthCheckPath: /health
+      HealthCheckProtocol: TCP
       HealthCheckIntervalSeconds: 30
       HealthyThresholdCount: 2
       UnhealthyThresholdCount: 3
@@ -103,8 +92,8 @@ Resources:
   Listener:
     Type: AWS::ElasticLoadBalancingV2::Listener
     Properties:
-      LoadBalancerArn: !Ref Alb
-      Protocol: HTTP
+      LoadBalancerArn: !Ref Nlb
+      Protocol: TCP
       Port: 80
       DefaultActions:
         - Type: forward
@@ -173,4 +162,4 @@ Resources:
 Outputs:
   McpEndpoint:
     Description: MCP server URL — use in client config with transport sse
-    Value: !Sub "http://${Alb.DNSName}/sse"
+    Value: !Sub "http://${Nlb.DNSName}/sse"

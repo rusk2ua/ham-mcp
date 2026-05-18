@@ -105,14 +105,4 @@ def parse_log(year: str, log_key: str) -> list[dict]:
 
 if __name__ == "__main__":
     import uvicorn
-    from starlette.requests import Request
-    from starlette.responses import JSONResponse
-    from starlette.routing import Route
-
-    # Add /health for ALB health checks
-    async def health(request: Request):
-        return JSONResponse({"status": "ok"})
-
-    app = mcp.sse_app()
-    app.routes.append(Route("/health", health))
-    uvicorn.run(app, host="0.0.0.0", port=port)
+    uvicorn.run(mcp.sse_app(), host="0.0.0.0", port=port)
