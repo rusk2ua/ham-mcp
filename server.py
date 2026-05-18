@@ -9,7 +9,7 @@ from parsers import adif, cabrillo
 from sources import gdrive, s3
 
 load_dotenv()
-mcp = FastMCP("ham-radio")
+mcp = FastMCP("ham-radio", stateless_http=True)
 
 # Valid sub-folders under each year prefix
 YEAR_SUBFOLDERS = {"logs", "results", "articles", "rpt", "rules"}
