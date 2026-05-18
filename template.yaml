@@ -2,6 +2,11 @@ AWSTemplateFormatVersion: "2010-09-09"
 Transform: AWS::Serverless-2016-10-31
 Description: Ham Radio MCP Server — serverless deployment
 
+Parameters:
+  S3BucketName:
+    Type: String
+    Description: Name of the existing S3 bucket containing your ham radio logs and documents (e.g. ham-mcp-demo-bucket)
+
 Globals:
   Function:
     Runtime: python3.13
@@ -9,7 +14,7 @@ Globals:
     MemorySize: 256
     Environment:
       Variables:
-        S3_BUCKET: !Ref DataBucket
+        S3_BUCKET: !Ref S3BucketName
         AWS_REGION: !Ref AWS::Region
 
 Resources:
@@ -20,7 +25,7 @@ Resources:
       CodeUri: .
       Policies:
         - S3ReadPolicy:
-            BucketName: !Ref DataBucket
+            BucketName: !Ref S3BucketName
       Events:
         Api:
           Type: HttpApi
@@ -28,15 +33,10 @@ Resources:
             Path: /{proxy+}
             Method: ANY
 
-  DataBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: !Sub "ham-radio-data-${AWS::AccountId}"
-
 Outputs:
   McpEndpoint:
     Description: MCP server URL — use this in your client config with transport sse
     Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
-  DataBucketName:
-    Description: S3 bucket for logs and documents
-    Value: !Ref DataBucket
+  S3BucketName:
+    Description: S3 bucket configured for this deployment
+    Value: !Ref S3BucketName
