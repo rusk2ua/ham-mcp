@@ -9,7 +9,8 @@ from parsers import adif, cabrillo
 from sources import gdrive, s3
 
 load_dotenv()
-mcp = FastMCP("ham-radio")
+port = int(os.getenv("PORT", "8080"))
+mcp = FastMCP("ham-radio", host="0.0.0.0", port=port)
 
 # Valid sub-folders under each year prefix
 YEAR_SUBFOLDERS = {"logs", "results", "articles", "rpt", "rules"}
@@ -103,5 +104,15 @@ def parse_log(year: str, log_key: str) -> list[dict]:
 
 
 if __name__ == "__main__":
-    port = int(os.getenv("PORT", "8080"))
-    mcp.run(transport="sse", host="0.0.0.0", port=port)
+    import uvicorn
+    from starlette.requests import Request
+    from starlette.responses import JSONResponse
+    from starlette.routing import Route
+
+    # Add /health for ALB health checks
+    async def health(request: Request):
+        return JSONResponse({"status": "ok"})
+
+    app = mcp.sse_app()
+    app.routes.append(Route("/health", health))
+    uvicorn.run(app, host="0.0.0.0", port=port)

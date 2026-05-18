@@ -161,28 +161,37 @@ Alternatively, edit `~/.vscode/cline_mcp_settings.json` directly with the same b
 
 ## AWS Serverless Deployment
 
-For shared access without everyone running a local server, deploy to AWS Lambda + API Gateway. At 1–2 concurrent users this costs effectively nothing (within Lambda free tier).
+For shared access without everyone running a local server, deploy to ECS Fargate + ALB. A single script handles everything: ECR repo creation, Docker build/push, and CloudFormation deploy.
+
+**Requirements:** AWS CLI, Docker, credentials with ECS/ECR/CloudFormation/IAM permissions.
 
 ```bash
-./run_aws.sh
+./deploy.sh --bucket your-s3-bucket-name
 ```
 
-The script runs `sam build` and `sam deploy`. On first run it prompts for stack name, region, and S3 bucket for deployment artifacts. Subsequent runs redeploy automatically.
+Optional flags:
+```
+--region   AWS region (default: us-east-1)
+--stack    CloudFormation stack name (default: ham-mcp)
+--gdrive   Google Drive folder ID (optional)
+```
 
-After deployment, use the `McpEndpoint` URL from the CloudFormation outputs in your client config:
+The script prints the MCP endpoint URL when complete. Use it in your client config:
 
 ```json
 {
   "mcpServers": {
     "ham-radio": {
-      "url": "https://<api-id>.execute-api.us-east-1.amazonaws.com/mcp",
-      "transport": "streamable-http"
+      "url": "http://<alb-dns-name>/sse",
+      "transport": "sse"
     }
   }
 }
 ```
 
-The base URL stays the same across redeployments. Only the `/mcp` path suffix and `streamable-http` transport are required.
+The base URL stays the same across redeployments as long as you use the same stack name. To update after code changes, just re-run `./deploy.sh` with the same arguments.
+
+**Cost:** ~$9/month for 1 Fargate task (0.25 vCPU / 0.5 GB). The ALB adds ~$16/month. Total ~$25/month for a always-on shared server.
 
 ---
 
@@ -215,7 +224,7 @@ Cabrillo QSO field positions vary by contest (ARRL DX, CQ WW, Field Day, etc.). 
 | PDF text is empty | PDF is image-only — run OCR before uploading |
 | MCP client can't connect | Use the absolute path to `server.py` in client config |
 | Lambda timeout | Increase `Timeout` in `template.yaml` (max 29s for API GW) |
-| "no authorization support detected" | Ensure you're using `transport: "streamable-http"` and the `/mcp` path suffix |
+| "no authorization support detected" | Ensure you're using `transport: "sse"` and the `/sse` path suffix |
 
 ---
 
