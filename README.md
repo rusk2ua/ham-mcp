@@ -4,6 +4,8 @@ An [MCP](https://modelcontextprotocol.io) server that connects ham radio logs, c
 
 Point your AI at an S3 bucket or Google Drive folder full of ADIF logs, Cabrillo contest files, and PDFs — then ask it questions in plain English.
 
+Note: This project is experimental. I encourage you to fork it and develop additional functionality.
+
 ---
 
 ## What It Does
